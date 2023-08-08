@@ -1,3 +1,4 @@
+import { sendPrompt } from "./functions/sendPrompt";
 import { generateTextQueryVector } from "./functions/textSearch";
 
 const express = require("express");
@@ -19,9 +20,10 @@ app.get("/status", (request: any, res: any) => {
     res.send(status);
 });
 
-app.post("/generate-query-vector", async (req: any, res: any) => {
+app.post("/send-prompt", async (req: any, res: any) => {
     // return generateTextQueryVector(req?.prompt);
-    res.send({ result: 'it worked' });
+    const result = await sendPrompt(req.prompt);
+    res.send({ result: result });
 });
 
 app.listen(3000, function () {
