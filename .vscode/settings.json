@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/6e965d3a-9f41-44ec-8936-181378cd7ffe/resourceGroups/rgroup-icm/providers/Microsoft.Web/sites/webapi-hackathon",
+    "appService.deploySubpath": "."
+}
