@@ -6,6 +6,7 @@ import {
 import { sendPrompt } from "./functions/sendPrompt";
 import { Configuration } from 'botbuilder-dialogs-adaptive-runtime-core';
 import path from "path";
+import { SendMessage } from "./functions/sendMessage";
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
@@ -60,8 +61,10 @@ const myBot = new EchoBot();
 app.use(cors());
 
 app.get("/", (req: any, res: any) => {
-    // res.sendFile(__dirname + "/index.html");
-    res.send('home');
+    console.log(path.resolve(__dirname, "../index.html"));
+    res.sendFile(path.resolve(__dirname, "../index.html"));
+    
+    // res.send('home');
 });
 
 app.get("/status", (request: any, res: any) => {
@@ -72,13 +75,19 @@ app.get("/status", (request: any, res: any) => {
     res.send(status);
 });
 
+app.post("/completion", async (req: any, res: any) => {
+    const sendMessage = new SendMessage();
+    const result = sendMessage.sendMessage(req.prompt);
+    res.send({ result: result });
+});
+
 app.post("/completions", async (req: any, res: any) => {
     // return generateTextQueryVector(req?.prompt);
     const result = await sendPrompt(req.prompt);
     res.send({ result: result });
 });
 
-app.on('upgrade', async (req: any, socket: any, head: any) => {
+/** app.on('upgrade', async (req: any, socket: any, head: any) => {
     // Create an adapter scoped to this WebSocket connection to allow storing session data.
     const streamingAdapter = new CloudAdapter(botFrameworkAuthentication);
 
@@ -86,7 +95,7 @@ app.on('upgrade', async (req: any, socket: any, head: any) => {
     streamingAdapter.onTurnError = onTurnErrorHandler;
 
     await streamingAdapter.process(req, socket, head, (context) => myBot.run(context));
-});
+}); **/
 
 app.listen(3000, function () {
     console.log("Server is running on localhost:3000");

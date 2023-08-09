@@ -23,10 +23,10 @@ export class EchoBot extends ActivityHandler {
             new Calculator(), 
             new DadJokeAPI(),
             new PetFinderAPI(),
-            new IFTTTWebhook(
+            /** new IFTTTWebhook(
                 `https://maker.ifttt.com/trigger/spotify/json/with/key/${process.env.IFTTTKey}`, 
                 'Spotify', 
-                'Play a song on Spotity.')
+                'Play a song on Spotity.') **/
         ];
 
         this.onMessage(async (context, next) => {
