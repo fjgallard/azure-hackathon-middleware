@@ -1,17 +1,27 @@
-import { MessageFactory } from "botbuilder";
-import { OpenAI } from "langchain";
-import { AgentExecutor, initializeAgentExecutor } from "langchain/agents";
-import { Calculator, Tool } from "langchain/tools";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { AgentExecutor, initializeAgentExecutorWithOptions } from "langchain/agents";
+import { Calculator } from "langchain/tools/calculator";
 import { DadJokeAPI } from "../tools/DadJokeAPI";
 import { PetFinderAPI } from "../tools/FindPetsAPI";
 
+const KEY: string = process.env.OPENAI_API_KEY || '';
+const ENDPOINT: string = process.env.OPENAI_API_BASE || '';
 export class SendMessage {
-    model: OpenAI;
-    tools: Tool[];
+    // model: OpenAIClient;
+    model: ChatOpenAI;
+    tools: any[];
     executor!: AgentExecutor;
 
     constructor() {
-        this.model = new OpenAI({ temperature: 0.9 });
+        this.model = new ChatOpenAI({ 
+            temperature: 0.5, 
+            azureOpenAIApiKey: process.env.OPENAI_API_KEY,
+            azureOpenAIApiDeploymentName: process.env.DEPLOYMENT_NAME,
+            azureOpenAIApiVersion: process.env.OPENAI_API_VERSION,
+
+         });
+        // this.model = new OpenAIClient(ENDPOINT, new AzureKeyCredential(KEY));
         this.tools = [
             // new BingSerpAPI(), 
             new Calculator(), 
@@ -22,24 +32,28 @@ export class SendMessage {
                 'Spotify', 
                 'Play a song on Spotity.') **/
         ];
+
+        // const embeddings = new OpenAIEmbeddings();
     }
 
     async sendMessage(input: string): Promise<string> {
+
         try {
             if (!this.executor) {
     
-                this.executor = await initializeAgentExecutor(
+                this.executor = await initializeAgentExecutorWithOptions(
                     this.tools,
                     this.model,
-                    "zero-shot-react-description"
+                    {
+                        agentType: "zero-shot-react-description",
+                     }
                 );
                 console.log("Loaded agent.");
             }
-        
             const execResponse = await this.executor.call({input});
-    
+            
             const replyText = execResponse.output;
-    
+            // console.log(replyText);
             return replyText;
             
         }
